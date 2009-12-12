@@ -50,12 +50,12 @@ module NineOneOne
       
       body = [
         first_row.datetime.strftime("%l:%M%P"),
-        "#{units.length} Units: #{units.join(" ")}",
+        "#{units.length}: #{units.join(" ")}",
         first_row.location,
         first_row.incident_type
       ].join(" - ")
       
-      body << "http://j.mp/sea911" if body.length <= 122
+      body << " - http://j.mp/sea911" if body.length <= 119
       
       update_twitter(body)
       #send_email_notification(body)
