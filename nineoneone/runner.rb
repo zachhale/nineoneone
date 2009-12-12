@@ -46,7 +46,7 @@ module NineOneOne
       units = rows.sum(&:units).uniq
       
       body = [
-        Time.parse(first_row.datetime).strftime("%l:%M%P"),
+        first_row.datetime.strftime("%l:%M%P"),
         "#{units.length} Units: #{units.join(" ")}",
         first_row.location,
         first_row.incident_type,
