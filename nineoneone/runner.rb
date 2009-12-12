@@ -3,13 +3,16 @@ require 'redis'
 require 'time'
 require 'active_support'
 require 'pony'
+require 'twitter'
 
 module NineOneOne
   class Runner
     @@interval = 60
     
-    def initialize(recipients)
-      @recipients = recipients
+    def initialize(config)
+      @recipients = config['recipients']
+      @twitter_login = config['twitter_login']
+      
       @redis = Redis.new
     end
     
@@ -49,11 +52,28 @@ module NineOneOne
         first_row.datetime.strftime("%l:%M%P"),
         "#{units.length} Units: #{units.join(" ")}",
         first_row.location,
-        first_row.incident_type,
-        "http://j.mp/sea911"
+        first_row.incident_type
       ].join(" - ")
       
-      Pony.mail(:from => '911@z122.com', 
+      body << "http://j.mp/sea911" if body.length <= 122
+      
+      update_twitter(body)
+      #send_email_notification(body)
+    end
+    
+    def update_twitter(body)
+      begin
+        auth = Twitter::HTTPAuth.new(@twitter_login['login'], 
+                                     @twitter_login['password'])
+        client = Twitter::Base.new(auth)
+        client.update(body[0,140])
+      rescue Errno::ECONNRESET
+        update_twitter(body)
+      end
+    end  
+    
+    def send_email_notification(body)
+      Pony.mail(:from => '911@zachhale.com', 
                 :to => @recipients.join(', '), 
                 :body => body,
                 :via => :smtp, 
@@ -63,7 +83,8 @@ module NineOneOne
                   :tls => true,
                   :user => '911@zachhale.com',
                   :password => 'P73375P73375',
-                  :auth => :plain, # :plain, :login, :cram_md5, no auth by default
+                  :auth => :plain, # :plain, :login, :cram_md5, no auth by default,
+                  :domain => 'zachhale.com'
                 })
     end
   end
