@@ -22,7 +22,7 @@ module NineOneOne
         
         # get the locations we've already notified about in the last 24 hours
         now = Time.now.to_i
-        already_notified = @redis.zset_range_by_score(base_key, now - 24.hours.to_i, now)
+        already_notified = @redis.zset_range_by_score(base_key, now - 4.hours.to_i, now)
         
         # throw out ones we've already flagged
         results.reject! { |location, rows| already_notified.include?(location.sub(' ','-')) }
@@ -42,11 +42,12 @@ module NineOneOne
   
     # 12:57am - E11 E37 M32 - 9422 24th Av SW - Medic Response, 7 per Rule
     def send_notification(rows)
-      first_row = rows.sort_by{|row| Time.parse(row.datetime)}.reverse.first
+      first_row = rows.sort_by(&:datetime).first
+      units = rows.sum(&:units)
       
       body = [
         Time.parse(first_row.datetime).strftime("%l:%M%P"),
-        rows.sum(&:units).join(" "),
+        "#{units.length} Units: #{units.join(" ")}",
         first_row.location,
         first_row.incident_type,
         "http://j.mp/sea911"

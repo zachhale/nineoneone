@@ -11,7 +11,7 @@ module NineOneOne
             
       @rows = doc.xpath('/html/body/table[1]/tr[3]/td/table/tr/td/table/tr').map do |row|
         cells = row.xpath('td')
-        OpenStruct.new(:datetime => cells[0].content.strip,
+        OpenStruct.new(:datetime =>  Time.parse(cells[0].content.strip),
                        :incident_num => cells[1].content.strip,
                        :level => cells[2].content.strip,
                        :units => cells[3].content.strip.split(" "),
@@ -21,22 +21,25 @@ module NineOneOne
     end
     
     def top(limit)
-      sorted = rows_by_location.sort_by{|location, rows| rows.length}.reverse
+      sorted = recent_rows_by_location.sort_by{|location, rows| rows.length}.reverse
       top = sorted[0,limit]
       top.map{|location, rows| [location, rows]}
     end
     
     def at_least(limit)
-      at_least = rows_by_location.select{|location, rows| rows.sum(&:units).length >= limit}
+      at_least = recent_rows_by_location.select{|location, rows| rows.sum(&:units).length >= limit}
       at_least.map{|location, rows| [location, rows]}
     end
     
   private
   
-    def rows_by_location
-      locations = @rows.map(&:location).uniq
-      with_rows = locations.map do |location|
-        [location, @rows.select{|row| row.location == location}]
+    def recent_rows_by_location
+      oldest_datetime = Time.now - 4.hours
+      recent_rows = @rows.select{|row| row.datetime > oldest_datetime}
+      locations = recent_rows.map(&:location).uniq
+      
+      locations.map do |location|
+        [location, recent_rows.select{|row| row.location == location}]
       end
     end
   end
