@@ -43,7 +43,7 @@ module NineOneOne
     # 12:57am - E11 E37 M32 - 9422 24th Av SW - Medic Response, 7 per Rule
     def send_notification(rows)
       first_row = rows.sort_by(&:datetime).first
-      units = rows.sum(&:units)
+      units = rows.sum(&:units).uniq
       
       body = [
         Time.parse(first_row.datetime).strftime("%l:%M%P"),

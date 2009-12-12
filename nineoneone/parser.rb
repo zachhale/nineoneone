@@ -27,7 +27,9 @@ module NineOneOne
     end
     
     def at_least(limit)
-      at_least = recent_rows_by_location.select{|location, rows| rows.sum(&:units).length >= limit}
+      at_least = recent_rows_by_location.select do |location, rows| 
+        rows.sum(&:units).uniq.length >= limit
+      end
       at_least.map{|location, rows| [location, rows]}
     end
     
