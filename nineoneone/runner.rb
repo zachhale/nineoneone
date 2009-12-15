@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'redis'
 require 'time'
-require 'pony'
+# require 'pony'
 require 'twitter'
 
 module NineOneOne
@@ -72,20 +72,20 @@ module NineOneOne
       end
     end  
     
-    def send_email_notification(body)
-      Pony.mail(:from => '911@zachhale.com', 
-                :to => @recipients.join(', '), 
-                :body => body,
-                :via => :smtp, 
-                :smtp => {
-                  :host => 'smtp.gmail.com',
-                  :port => '587',
-                  :tls => true,
-                  :user => '911@zachhale.com',
-                  :password => 'P73375P73375',
-                  :auth => :plain, # :plain, :login, :cram_md5, no auth by default,
-                  :domain => 'zachhale.com'
-                })
-    end
+    # def send_email_notification(body)
+    #   Pony.mail(:from => '911@zachhale.com', 
+    #             :to => @recipients.join(', '), 
+    #             :body => body,
+    #             :via => :smtp, 
+    #             :smtp => {
+    #               :host => 'smtp.gmail.com',
+    #               :port => '587',
+    #               :tls => true,
+    #               :user => '911@zachhale.com',
+    #               :password => 'P73375P73375',
+    #               :auth => :plain, # :plain, :login, :cram_md5, no auth by default,
+    #               :domain => 'zachhale.com'
+    #             })
+    # end
   end
 end
