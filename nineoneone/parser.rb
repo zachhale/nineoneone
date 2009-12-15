@@ -36,7 +36,7 @@ module NineOneOne
   private
   
     def recent_rows_by_location
-      oldest_datetime = Time.now - 4.hours
+      oldest_datetime = Time.now - 14400 # 4 hours
       recent_rows = @rows.select{|row| row.datetime > oldest_datetime}
       locations = recent_rows.map(&:location).uniq
       
