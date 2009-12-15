@@ -16,7 +16,7 @@ module NineOneOne
     end
     
     def watch(meth, *args)
-      loop do
+      #loop do
         results = NineOneOne::Parser.new.send(meth, *args)
         
         base_key = "nineoneone:#{meth}"
@@ -37,8 +37,8 @@ module NineOneOne
           @redis.zset_add(base_key, Time.now.to_i, location.sub(' ','-'))
         end
         
-        sleep @@interval
-      end
+      #  sleep @@interval
+      #end
     end
     
   private
