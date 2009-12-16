@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'redis'
 require 'time'
-# require 'active_support'
 require 'twitter'
+require 'extensions/all'
 # require 'pony'
 
 module NineOneOne
