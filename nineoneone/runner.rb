@@ -1,8 +1,9 @@
 require 'rubygems'
 require 'redis'
 require 'time'
-# require 'pony'
+require 'active_support'
 require 'twitter'
+# require 'pony'
 
 module NineOneOne
   class Runner
