@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'redis'
 require 'time'
-require 'active_support'
+# require 'active_support'
 require 'twitter'
 # require 'pony'
 
