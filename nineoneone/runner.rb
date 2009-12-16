@@ -56,10 +56,10 @@ module NineOneOne
         first_row.incident_type
       ].join(" - ")
       
-      body << " - http://j.mp/sea911" if body.length <= 119
+      # body << " - http://j.mp/sea911" if body.length <= 119
       
       update_twitter(body)
-      #send_email_notification(body)
+      # send_email_notification(body)
     end
     
     def update_twitter(body)
