@@ -2,44 +2,43 @@ require 'rubygems'
 require 'extensions/symbol'
 require 'redis'
 require 'time'
-require 'twitter'
-# require 'pony'
 
 module NineOneOne
   class Runner
-    @@interval = 60
+    @@sleep_interval = 60
     
-    def initialize(config)
-      @recipients = config['recipients']
-      @twitter_login = config['twitter_login']
-      
+    def initialize(notifiers)
+      @notifiers = [*notifiers]
       @redis = Redis.new
     end
     
     def watch(meth, *args)
-      #loop do
-        results = NineOneOne::Parser.new.send(meth, *args)
-        
-        base_key = "nineoneone:#{meth}"
-        base_key << ":#{args.join(':')}" unless args.empty?
-        
-        # get the locations we've already notified about in the last 24 hours
-        now = Time.now.to_i
-        past = 14400 # 4 hours
-        already_notified = @redis.zset_range_by_score(base_key, now - past, now)
-        
-        # throw out ones we've already flagged
-        results.reject! { |location, rows| already_notified.include?(location.sub(' ','-')) }
-        
-        # notify for new ones
-        results.each do |location, rows|
-          puts "#{Time.now.strftime("%l:%M%P")}: #{location} # => #{rows.sum(&:units).length}"
-          send_notification(rows)
-          @redis.zset_add(base_key, Time.now.to_i, location.sub(' ','-'))
-        end
-        
-      #  sleep @@interval
-      #end
+      loop do
+        run(meth, *args)
+        sleep @@sleep_interval
+      end
+    end
+
+    def run(meth, *args)
+      results = NineOneOne::Parser.new.send(meth, *args)
+
+      base_key = "nineoneone:#{meth}"
+      base_key << ":#{args.join(':')}" unless args.empty?
+
+      # get the locations we've already notified about in the last 24 hours
+      now = Time.now.to_i
+      past = 14400 # 4 hours
+      already_notified = @redis.zset_range_by_score(base_key, now - past, now)
+
+      # throw out ones we've already flagged
+      results.reject! { |location, rows| already_notified.include?(location.sub(' ','-')) }
+
+      # notify for new ones
+      results.each do |location, rows|
+        puts "#{Time.now.strftime("%l:%M%P")}: #{location} # => #{rows.sum(&:units).length}"
+        send_notification(rows)
+        @redis.zset_add(base_key, Time.now.to_i, location.sub(' ','-'))
+      end
     end
     
   private
@@ -56,37 +55,9 @@ module NineOneOne
         first_row.incident_type
       ].join(" - ")
       
-      # body << " - http://j.mp/sea911" if body.length <= 119
-      
-      update_twitter(body)
-      # send_email_notification(body)
-    end
-    
-    def update_twitter(body)
-      begin
-        auth = Twitter::HTTPAuth.new(@twitter_login['login'], 
-                                     @twitter_login['password'])
-        client = Twitter::Base.new(auth)
-        client.update(body[0,140])
-      rescue Errno::ECONNRESET
-        update_twitter(body)
+      @notifiers.each do |notifier|
+        notifier.notify(body)
       end
-    end  
-    
-    # def send_email_notification(body)
-    #   Pony.mail(:from => '911@zachhale.com', 
-    #             :to => @recipients.join(', '), 
-    #             :body => body,
-    #             :via => :smtp, 
-    #             :smtp => {
-    #               :host => 'smtp.gmail.com',
-    #               :port => '587',
-    #               :tls => true,
-    #               :user => '911@zachhale.com',
-    #               :password => 'P73375P73375',
-    #               :auth => :plain, # :plain, :login, :cram_md5, no auth by default,
-    #               :domain => 'zachhale.com'
-    #             })
-    # end
+    end
   end
 end
