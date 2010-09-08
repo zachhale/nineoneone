@@ -1,0 +1,28 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    SystemTimer (1.2)
+    crack (0.1.6)
+    extensions (0.6.0)
+    hashie (0.2.2)
+    httparty (0.5.2)
+      crack (= 0.1.6)
+    nokogiri (1.4.3.1)
+    oauth (0.4.3)
+    redis (2.0.5)
+    twitter (0.9.8)
+      hashie (~> 0.2.0)
+      httparty (~> 0.5.0)
+      oauth (~> 0.4.1)
+      yajl-ruby (~> 0.7.0)
+    yajl-ruby (0.7.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  SystemTimer
+  extensions
+  nokogiri
+  redis
+  twitter

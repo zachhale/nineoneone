@@ -6,12 +6,12 @@ require 'time'
 module NineOneOne
   class Runner
     @@sleep_interval = 60
-    
+
     def initialize(notifiers)
       @notifiers = [*notifiers]
       @redis = Redis.new
     end
-    
+
     def watch(meth, *args)
       loop do
         run(meth, *args)
@@ -40,21 +40,21 @@ module NineOneOne
         @redis.zset_add(base_key, Time.now.to_i, location.sub(' ','-'))
       end
     end
-    
+
   private
-  
+
     # 12:57am - E11 E37 M32 - 9422 24th Av SW - Medic Response, 7 per Rule
     def send_notification(rows)
       first_row = rows.sort_by(&:datetime).first
       units = rows.sum(&:units).uniq
-      
+
       body = [
         first_row.datetime.strftime("%l:%M%P"),
         "#{units.length}: #{units.join(" ")}",
         first_row.location,
         first_row.incident_type
       ].join(" - ")
-      
+
       @notifiers.each do |notifier|
         notifier.notify(body)
       end

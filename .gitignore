@@ -1,2 +1,5 @@
 .DS_Store
 settings.yml
+.rvmrc
+dump.rdb
+.bundle/*
