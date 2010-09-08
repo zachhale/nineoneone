@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'extensions/symbol'
+require 'extensions/symbol' unless :symbol.respond_to?(:to_proc)
 require 'redis'
 require 'time'
 
@@ -28,7 +28,7 @@ module NineOneOne
       # get the locations we've already notified about in the last 24 hours
       now = Time.now.to_i
       past = 14400 # 4 hours
-      already_notified = @redis.zset_range_by_score(base_key, now - past, now)
+      already_notified = @redis.zrangebyscore(base_key, now - past, now)
 
       # throw out ones we've already flagged
       results.reject! { |location, rows| already_notified.include?(location.sub(' ','-')) }
@@ -37,7 +37,7 @@ module NineOneOne
       results.each do |location, rows|
         puts "#{Time.now.strftime("%l:%M%P")}: #{location} # => #{rows.sum(&:units).length}"
         send_notification(rows)
-        @redis.zset_add(base_key, Time.now.to_i, location.sub(' ','-'))
+        @redis.zadd(base_key, Time.now.to_i, location.sub(' ','-'))
       end
     end
 
