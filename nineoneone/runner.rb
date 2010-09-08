@@ -28,7 +28,7 @@ module NineOneOne
       # get the locations we've already notified about in the last 24 hours
       now = Time.now.to_i
       past = 14400 # 4 hours
-      already_notified = @redis.zrangebyscore(base_key, now - past, now)
+      already_notified = @redis.zrangebyscore(base_key, now - past, now) || []
 
       # throw out ones we've already flagged
       results.reject! { |location, rows| already_notified.include?(location.sub(' ','-')) }

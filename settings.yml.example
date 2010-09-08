@@ -1,3 +1,5 @@
 twitter_credentials:
-  login: TWITTER_LOGIN
-  password: TWITTER_PASSWORD
+  consumer_token: TOKEN
+  consumer_secret: SECRET
+  access_token: TOKEN
+  access_secret: SECRET

@@ -10,9 +10,9 @@ end
 
 # for testing
 desc "Parse"
-task :at_least_2 do
+task :at_least_3 do
   parser = NineOneOne::Parser.new
-  results = parser.at_least(2)
+  results = parser.at_least(3)
 
   results.each do |location, rows|
     puts location
