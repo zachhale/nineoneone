@@ -50,9 +50,9 @@ module NineOneOne
 
       body = [
         first_row.datetime.strftime("%l:%M%P"),
-        "#{units.length}: #{units.join(" ")}",
+        first_row.incident_type,
         first_row.location,
-        first_row.incident_type
+        "#{units.length}: #{units.join(" ")}",
       ].join(" - ")
 
       @notifiers.each do |notifier|

@@ -2,6 +2,8 @@ require 'twitter'
 
 module NineOneOne
   class TwitterNotifier
+    include NineOneOne::TextHelper
+
     attr_accessor :consumer_token
     attr_accessor :consumer_secret
     attr_accessor :access_token
@@ -19,10 +21,12 @@ module NineOneOne
       auth.authorize_from_access(@access_token, @access_secret)
       client = Twitter::Base.new(auth)
 
+      message = truncate(message, :length => 140, :omission => '..')
+
       begin
-        client.update(message[0,140])
+        client.update(message)
       rescue Errno::ECONNRESET
-        client.update(message[0,140]) # try one more time
+        client.update(message) # try one more time
       end
     end
   end
