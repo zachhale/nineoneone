@@ -52,7 +52,7 @@ module NineOneOne
         first_row.datetime.strftime("%l:%M%P"),
         first_row.incident_type,
         first_row.location,
-        "#{units.length}: #{units.join(" ")}",
+        "#{units.length}: #{units.sort.join(" ")}",
       ].join(" - ")
 
       @notifiers.each do |notifier|
