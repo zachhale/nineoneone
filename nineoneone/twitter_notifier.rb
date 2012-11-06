@@ -14,19 +14,22 @@ module NineOneOne
       @consumer_secret = credentials['consumer_secret']
       @access_token = credentials['access_token']
       @access_secret = credentials['access_secret']
+
+      Twitter.configure do |config|
+        config.consumer_key = @consumer_token
+        config.consumer_secret = @consumer_secret
+        config.oauth_token = @access_token
+        config.oauth_token_secret = @access_secret
+      end
     end
 
     def notify(message)
-      auth = Twitter::OAuth.new(@consumer_token, @consumer_secret)
-      auth.authorize_from_access(@access_token, @access_secret)
-      client = Twitter::Base.new(auth)
-
       message = truncate(message, :length => 140, :omission => '..')
 
       begin
-        client.update(message)
+        Twitter.update(message)
       rescue Errno::ECONNRESET
-        client.update(message) # try one more time
+        Twitter.update(message) # try one more time
       end
     end
   end

@@ -1,4 +1,5 @@
 require 'nineoneone'
+require 'yaml'
 
 desc "Run"
 task :run do
